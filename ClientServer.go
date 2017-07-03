@@ -45,7 +45,10 @@ func Server() {
 		// process the recieved string from client
 		newmessage := strings.ToUpper(message)
 		// send new string back to client
-		conn.Write([]byte(newmessage + "\n"))
+		_, sendingerror := conn.Write([]byte(newmessage + "\n"))
+
+		CheckErrors(sendingerror, "cannot send to socket")
+
 	}
 	wg.Done()
 

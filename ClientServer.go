@@ -42,9 +42,9 @@ func Server(wg *sync.WaitGroup) {
 		}
 
 		// process the recieved string from client
-		newmessage := strings.ToUpper(message)
+		newMessage := strings.ToUpper(message)
 		// send new string back to client
-		_, err = conn.Write([]byte(newmessage + "\n"))
+		_, err = conn.Write([]byte(newMessage + "\n"))
 
 		if err != nil {
 			fmt.Println("sendgin error!")

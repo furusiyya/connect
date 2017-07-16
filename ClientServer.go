@@ -9,17 +9,16 @@ import (
 	"sync"
 )
 
-var wg sync.WaitGroup
-
 func main() {
+	var wg sync.WaitGroup
 	wg.Add(2)
-	go Server()
-	go Client()
+	go Server(&wg)
+	go Client(&wg)
 	wg.Wait()
 
 }
 
-func Server() {
+func Server(wg *sync.WaitGroup) {
 
 	// listen on all interfaces
 	ln, err := net.Listen("tcp", ":8081")
@@ -33,7 +32,7 @@ func Server() {
 		// will listen for messages from client
 		message, err := bufio.NewReader(conn).ReadString('\n')
 		if err != nil {
-			fmt.Println("Client Disconnected!\n")
+			fmt.Print("Client Disconnected!\n")
 			break
 		}
 
@@ -43,11 +42,14 @@ func Server() {
 		}
 
 		// process the recieved string from client
-		newmessage := strings.ToUpper(message)
+		newMessage := strings.ToUpper(message)
 		// send new string back to client
-		_, sendingerror := conn.Write([]byte(newmessage + "\n"))
+		_, err = conn.Write([]byte(newMessage + "\n"))
 
-		CheckErrors(sendingerror, "cannot send to socket")
+		if err != nil {
+			fmt.Println("sendgin error!")
+			panic(err)
+		}
 
 	}
 	wg.Done()
@@ -56,12 +58,14 @@ func Server() {
 
 func CheckErrors(err error, message string) {
 	if err != nil {
+
 		panic(err)
 	}
 	fmt.Println(message)
+
 }
 
-func Client() {
+func Client(wg *sync.WaitGroup) {
 
 	// connect to this socket
 	conn, err := net.Dial("tcp", "127.0.0.1:8081")
@@ -76,7 +80,7 @@ func Client() {
 		// listen for reply
 		message, err := bufio.NewReader(conn).ReadString('\n')
 		if err != nil {
-			fmt.Println("Disconnected\n")
+			fmt.Print("Disconnected\n")
 			conn.Close()
 			break
 		}

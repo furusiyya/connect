@@ -44,11 +44,11 @@ func Server(wg *sync.WaitGroup) {
 		// process the recieved string from client
 		newmessage := strings.ToUpper(message)
 		// send new string back to client
-		_, sendingerror := conn.Write([]byte(newmessage + "\n"))
+		_, err = conn.Write([]byte(newmessage + "\n"))
 
-		if sendingerror != nil {
+		if err != nil {
 			fmt.Println("sendgin error!")
-			panic(sendingerror)
+			panic(err)
 		}
 
 	}
